@@ -25,3 +25,16 @@ jobs:
 
     # - name: Run test suite
     #   run: composer run-script test
+  deploy:
+    needs: [build]
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH to AWX
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.AWX_USERNAME }}
+          host: ${{ secrets.AWX_HOST }}
+          key: ${{ secrets.AWX_SSH_KEY }}
+          script: |
+            tower-cli job launch --job-template=54 -v
